@@ -1,4 +1,9 @@
-import numpy as np	
+import numpy as np
+
+'''
+This is for the specific dataset of the Trajectory matrix
+Starting at 8am
+'''	
 	
 def get_time_step(time, day_ts = False):
 	'''

@@ -35,9 +35,9 @@ def com_predictor(matrix):
 		
 	predicting_matrix = np.vstack((x,y))
 	
-	#predicting_indexes =[x for x in range(matric.shape[2]) if x not in nodes_indexes]
 	nodes_matrix = dp.getSubset(nodes_indexes, matrix)
-	dcom = dp.get_delta_com(matrix)
+	
+	dcom = dp.get_delta_com(nodes_matrix)
 	i = 0
 	temp = predicting_matrix
 	for transition in dcom:
@@ -45,16 +45,12 @@ def com_predictor(matrix):
 		i = i +1
 		temp = move(transition, temp)
 		predicting_matrix = np.dstack((predicting_matrix, temp))
-	print "Predicting: ", predicting_matrix.shape
-	print "Nodes: ", nodes_matrix.shape
 	
 	predicting_matrix = predicting_matrix.reshape(matrix.shape[0], matrix.shape[1], matrix.shape[2]-6)
-	print "Predicting: ", predicting_matrix.shape
 	result = np.dstack((predicting_matrix, nodes_matrix))
-	print "Result: ", result.shape
-	matrix_file = scipy.io.savemat('newTrajectory.mat', mdict={'trajectory': result}, format = '5' )
+	
+	matrix_file = scipy.io.savemat('newTrajectory2.mat', mdict={'trajectory': result}, format = '5' )
 	return result
-	#return predicting_matrix
 	
 	
 	

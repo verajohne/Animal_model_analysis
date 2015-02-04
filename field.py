@@ -5,16 +5,16 @@ import scipy.io
 
 import frnnr
 import infection
-import stats
+
 
 #### CONSTANTS
-INFECTION_RADIUS = 100000
+INFECTION_RADIUS = 10
 
 class Field(object):
 	
 	def __init__(self, flocks, infection):
 		'''
-		flocks are just 3D matrices of flock movement per time
+		flocks are just 3D matrices of flock trajectory per time
 		right now assumes flocks are equal size
 		'''
 		self.flocks = flocks
@@ -41,17 +41,12 @@ class Field(object):
 		infection_map = np.zeros(self.nodes, dtype= 'int64')
 		infection_map = self.insert_infection(infection_map, 1)
 		
-		number_infected_time_1 = []
-		number_infected_time_2 = []
-		time90 = {}
+		number_infected = []
 		
 		for ts in range(self.time_samples):
-		#for ts in range(100):
 			infection_map = self.infect(ts, infection_map)
-			print "nr_of_infected ",np.bincount(infection_map)[1]
 			
-		
-			#count nr infected in each herd at each time step
+			#count nr infected in each herd at each time step for statistics
 			offset = 0
 			for f in range(len(self.flocks)):
 				l = infection_map[offset:(offset+self.nodes/len(self.flocks))]
@@ -59,33 +54,28 @@ class Field(object):
 					ni = np.bincount(l)[1]
 				except IndexError:
 					ni = 0
-				'''
-				if f == 0:
-					number_infected_time_1.append(ni)
-				else:
-					number_infected_time_2.append(ni)	
-				'''
-				if ni >= 90:
-					if f not in time90:
-						time90[f] = ts
+				number_infected.append(ni)
 				
-				if len(time90) == 2:
+				if ni >= 90:
 					break
-							
+				
 				offset = self.nodes/len(self.flocks)
-			if np.bincount(infection_map)[1] > 199:
-				break
-		
-		
-		#matrix_file = scipy.io.savemat('flock1.mat', mdict={'epi': np.array(number_infected_time_1)}, format = '5' )
-		#matrix_file = scipy.io.savemat('flock2.mat', mdict={'epi': np.array(number_infected_time_2)}, format = '5' )
+					
+		#matrix_file = scipy.io.savemat('flock1.mat', mdict={'epi': np.array(time90[0])}, format = '5' )
+		#matrix_file = scipy.io.savemat('flock2.mat', mdict={'epi': np.array(time90[1])}, format = '5' )
 		#return [number_infected_time_1, number_infected_time_2]
-		return [time90[0], time90[1]]
+		#return [time90[0], time90[1]]
+		print number_infected
+		return number_infected
 		
 	def infect(self, ts, infection_map):
-	
+		'''
+		given an infection_map over a field at a time instance
+		return an updated infection map
+		'''
 		not_infected_indexes = []
 		infected_indexes = []
+		infected_points = []
 		
 		for i in range(len(infection_map)):
 			if infection_map[i] == 1:
@@ -98,20 +88,18 @@ class Field(object):
 		y = self.points[1][ts]
 		
 		#get list of coordinates of infected nodes
-		infected_points = []
 		for i in infected_indexes:
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])
 			infected_points.append(p)
-		#print infected_points
 		
-		
+		#Get points within INFECTION RADIUS through fixed neighbour reporting
 		f = frnnr.frnnr(INFECTION_RADIUS, infected_points)
-
 		for i in not_infected_indexes:
+			#get an uninfected node
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])
-			#get list of distances to nearby infect-able nodes
-			dis = f.get_distances(p)
-			for d in dis:
+			#get list of distances to nearby infect-able nodes from uninfected node
+			distances = f.get_distances(p)
+			for d in distances:
 				inf = self.infection.infect(d)
 				if inf == 1:
 					infection_map[i] = 1

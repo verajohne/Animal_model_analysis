@@ -1,8 +1,6 @@
 import numpy as np
 import random
 
-
-
 class Infection(object):
 	
 	def __init__(self, p, d):

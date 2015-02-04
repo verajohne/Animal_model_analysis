@@ -4,9 +4,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import norm  
 import scipy.io
-
 import dataset_time as dst
 
+'''
+For plotting of data (pdf)
+Some of these functions are particular to my dataset
+'''
 
 
 def import_data(file, ds):

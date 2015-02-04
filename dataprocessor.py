@@ -4,18 +4,29 @@ from scipy.spatial import ConvexHull
 import random
 
 '''
-Standard matrix format is [space_dimensions,time_steps, nodes] 
-
+Standard matrix format is [space_dimensions,time_steps, nodes]
+Mostly a set of helper functions used in scripts and other modules
 '''
 
 def returnTimeMap(ts, matrix):
+	'''
+	returns 2D matrix image of points at particular timestep
+	'''
 	x = matrix[0][ts]
 	y = matrix[1][ts]
 	return np.vstack((x,y))
 	
 def importData():
-	trajectory_mat = scipy.io.loadmat('newTrajectory.mat')
+	'''
+	helper function for quick import of matlab matrices during testing
+	'''
+	trajectory_mat = scipy.io.loadmat('trajectory.mat')
 	trajectory = trajectory_mat['trajectory']
+	return trajectory
+	
+def importMatrix(matlabName, id):
+	trajectory_mat = scipy.io.loadmat(matlabName)
+	trajectory = trajectory_mat[id]
 	return trajectory
 	
 def randomlist(r, sample_size):
@@ -23,6 +34,9 @@ def randomlist(r, sample_size):
 	
 	
 def getTimeSeriesForNode(i, matrix):
+	'''
+	returns trajectory for a particular node over time
+	'''
 	matrix = matrix.reshape(matrix.shape[0],matrix.shape[2], matrix.shape[1])
 	x = matrix[0][i]
 	y = matrix[1][i]
