@@ -2,7 +2,7 @@
 
 ##Dependencies:
 ###Python:
-    -<a href = "http://www.scipy.org/"> Scipy </a><br>
-    -<a href = "http://www.numpy.org/"> Scipy </a><br>
-    -<a href = "http://www.matplotlib.org/"> Scipy </a> <br>
-    -<a href = "http://stanford.edu/~mwaskom/software/seaborn/"> SeaBorn </a>
+- [matplotlib](http://matplotlib.org/ "matplotlib")
+- [numpy](http://www.numpy.org "NumPy") (v1.6.2)
+- [scipy](http://www.scipy.org "SciPy")
+- [seaborn](http://stanford.edu/~mwaskom/software/seaborn/ "SeaBorn")
