@@ -78,15 +78,17 @@ def angle_between_vectors(v,u):
 	return angle
 
 def rotate(vector, angle):
+	#rotates clockwise
 	transition_matrix = np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]])
 	new_vector = np.dot(vector, transition_matrix)
 	return new_vector
 
 def rotate_about_point(vector, rotation_vector, angle):
-	x = ((vector[0] - rotation_vector[0]) * np.cos(angle)) - ((rotation_vector[1] - vector[1]) * np.sin(angle)) + rotation_vector[0]
-	y = ((rotation_vector[1] - vector[1]) * np.cos(angle)) - ((vector[0] - rotation_vector[0]) * np.sin(angle)) + rotation_vector[1]
-	return np.array([x,y])
-		
+	v = np.subtract(vector, rotation_vector)
+	v = rotate(v, angle)
+	v = np.add(v, rotation_vector)
+	return v
+
 def com(matrix):
 	#2D time instance matrix
 	return np.array([np.mean(matrix[0]), np.mean(matrix[1])])

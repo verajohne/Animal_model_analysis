@@ -60,6 +60,7 @@ def direction_predictor(matrix, subset = 6):
 	temp = predicting_matrix
 	dcom = dp.get_delta_com(nodes_matrix)
 	for ts in range(matrix.shape[1] - 1):
+		print ts
 		ts_position = np.zeros(2)
 		com94 = dp.com(predicting_matrix)
 		angle_between_com = dp.angle_between_vectors(com6[ts],com94)
@@ -68,7 +69,7 @@ def direction_predictor(matrix, subset = 6):
 		for node_id in range(predictions):
 			#this nodes position at previous ts
 			position = np.swapaxes(temp,0,1)[node_id]
-			postion = dp.rotate_about_point(position, com94, angle_between_com)
+			position = dp.rotate_about_point(position, com94, angle_between_com)
 			position = np.add(position, dcom[ts])
 			
 			
