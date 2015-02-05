@@ -22,6 +22,7 @@ class Simulation(object):
 		'''
 		function used by animate_flock
 		'''
+		
 		time = dst.get_time(time_step, only_time = True)
 		print time[0], ":", time[1]
 		xs = self.logger_data[0, time_step]
@@ -34,6 +35,7 @@ class Simulation(object):
 		fig1 = plt.figure()
 		xs = self.logger_data[0, 0]
 		ys = self.logger_data[1, 0]
+		
 		data = np.concatenate((xs,ys)).reshape(2,self.nr_of_loggers)
 		l, = plt.plot([], [], 'ro')
 		#hard coded for now
@@ -44,6 +46,6 @@ class Simulation(object):
 		plt.xlabel('y-coordinate')
 		plt.title('Sheep moving around')
 		line_ani = animation.FuncAnimation(fig1, self.update_plot, self.nr_of_samples, 
-			fargs=(data, l), interval=1, blit=False, repeat = False)
-
+			fargs=(data, l), interval=10, blit=False, repeat = False)
+		
 		plt.show()

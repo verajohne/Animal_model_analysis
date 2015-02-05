@@ -20,7 +20,7 @@ def importData():
 	'''
 	helper function for quick import of matlab matrices during testing
 	'''
-	trajectory_mat = scipy.io.loadmat('trajectory.mat')
+	trajectory_mat = scipy.io.loadmat('../matrixes/trajectory.mat')
 	trajectory = trajectory_mat['trajectory']
 	return trajectory
 	
@@ -37,10 +37,8 @@ def getTimeSeriesForNode(i, matrix):
 	'''
 	returns trajectory for a particular node over time
 	'''
-	matrix = matrix.reshape(matrix.shape[0],matrix.shape[2], matrix.shape[1])
-	x = matrix[0][i]
-	y = matrix[1][i]
-	return np.vstack((x,y))
+	matrix = np.transpose(matrix)
+	return np.transpose(matrix[i])
 
 def getSubset(indexes, matrix):
 	'''
@@ -63,14 +61,38 @@ def getListPoints(x,y):
 		points.append(p)
 	return points
 
+def angle_between_vectors(v,u):
+	angle_v = vector_to_angle(v)
+	angle_u = vector_to_angle(u)
+	
+	cosine_of_angle = np.dot(v,u)/np.linalg.norm(v)/np.linalg.norm(u) #check if this will be decimal division
+	angle = np.arccos(cosine_of_angle)
+	if np.isnan(angle):
+		if (v == u).all():
+			angle = 0.0
+		else:
+			angle = np.pi
+	if angle_v > angle_u:
+		angle = -angle
+	
+	return angle
+
+def rotate(vector, angle):
+	transition_matrix = np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]])
+	new_vector = np.dot(vector, transition_matrix)
+	return new_vector
+	
+def com(matrix):
+	#2D time instance matrix
+	return np.array([np.mean(matrix[0]), np.mean(matrix[1])])
+
 def get_com(matrix):
 	com = []
 	for ts in range(matrix.shape[1]):
 		xs = np.mean(matrix[0, ts])
 		ys = np.mean(matrix[1, ts])
 		comts = np.array([xs,ys])
-		com.append(comts)
-		
+		com.append(comts)	
 	return np.array(com)
 
 def get_delta_com(matrix):
@@ -109,8 +131,25 @@ def ch_area(matrix):
 		area = polygon_area(p)
 		ch_area.append(area)
 	return ch_area
-		
 	
+def vector_to_angle(vector):
+	'''returns positive angles '''
+	x = vector[0]
+	y = vector[1]
+	phi = 0
+	if x == 0:
+		if y  > 0:
+			phi = np.pi/2
+		else:
+			phi = np.pi*3/2
+	else:
+		phi = np.arctan(y/x)	# x > 0, y >0 || x > 0, y==0
+		if x < 0:
+			phi = phi + np.pi
+		else:
+			if y < 0: # x > 0, y < 0
+				phi = phi + 2*np.pi
+	return phi
 
 
 
