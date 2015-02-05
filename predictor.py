@@ -58,7 +58,7 @@ def direction_predictor(matrix, subset = 6):
 	
 	#same as iterating thought time
 	temp = predicting_matrix
-	
+	dcom = dp.get_delta_com(nodes_matrix)
 	for ts in range(matrix.shape[1] - 1):
 		ts_position = np.zeros(2)
 		com94 = dp.com(predicting_matrix)
@@ -67,14 +67,11 @@ def direction_predictor(matrix, subset = 6):
 		#create new position 2d matrix for ts
 		for node_id in range(predictions):
 			#this nodes position at previous ts
-			position0 = np.swapaxes(temp,0,1)[node_id]
-			position = dp.rotate(position0, angle_between_com)
+			position = np.swapaxes(temp,0,1)[node_id]
+			postion = dp.rotate_about_point(position, com94, angle_between_com)
+			position = np.add(position, dcom[ts])
 			
-			#position = np.transpose(temp)[node_id]
-			#position = np.subtract(position0, com94)
-			#position = np.add(position, com6[ts])
-			#tran = np.subtract(com6[ts], com94)
-			#position = np.add(position0, tran)
+			
 			if node_id == 0:
 				ts_position = position
 			else:
@@ -94,6 +91,12 @@ def direction_predictor(matrix, subset = 6):
 	#matrix_file = scipy.io.savemat('newTrajectory2.mat', mdict={'trajectory': result}, format = '5' )
 	
 	return result
+
+'''
+ROTATE 94 points about com94
+
+
+'''
 	
 
 	
