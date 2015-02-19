@@ -8,6 +8,53 @@ Standard matrix format is [space_dimensions,time_steps, nodes]
 Mostly a set of helper functions used in scripts and other modules
 '''
 
+def merge_matrixes(matrixes):
+	result = matrixes[0]
+	for i in range(1,len(matrixes)):
+		result = np.dstack((result, matrixes[i]))
+	return result
+
+def random_walk(steps):
+	temp = np.array([1000.0,1000.5])
+	result = [temp]
+	i = 0
+	for step in range(steps -1):
+		#if step % 120 == 0:
+		#	i = i + np.pi/2
+		#	i = i % (3*np.pi/2)
+		#direction = np.random.uniform(0+i,np.pi/2 +i)
+		'''
+		direction = np.random.uniform(0,2*np.pi)
+		dx = np.cos(direction)
+		dy = np.sin(direction)
+		d = np.array([dx,dy])
+		temp = np.add(temp, d)
+		result.append(temp)
+		'''
+		result.append(temp)
+	return result
+		
+
+def random_array_list(listlength):
+	result = []
+	step_size = 0.5
+	for i in range(listlength):
+		a = np.array([np.random.randint(0,3000),np.random.randint(0,3000)])
+		result.append(a)
+	return result
+
+
+def partition_matrix(matrix, partition_size):
+	x = matrix[0][0]
+	y = matrix[1][0]
+	
+	set1_indexes = randomlist(matrix.shape[2], partition_size)
+	set2_indexes = [x for x in range(matrix.shape[2]) if x not in set1_indexes]
+	matrix1 = getSubset(set1_indexes, matrix)
+	matrix2 = getSubset(set2_indexes, matrix)
+	
+	return [matrix1, matrix2]
+
 def returnTimeMap(ts, matrix):
 	'''
 	returns 2D matrix image of points at particular timestep
@@ -72,7 +119,7 @@ def angle_between_vectors(v,u):
 			angle = 0.0
 		else:
 			angle = np.pi
-	if angle_v > angle_u: #??? should i do this?
+	if angle_v < angle_u: #??? should i do this?
 		angle = -angle
 	
 	return angle

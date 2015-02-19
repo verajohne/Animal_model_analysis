@@ -13,14 +13,14 @@ def get_ch_flock(ch):
 	return 13*ch
 
 def get_com_flock(com):
-	return c
+	return com
 
 def partition_matrix(matrix, partition_size):
 	x = matrix[0][0]
 	y = matrix[1][0]
 	
-	#nodes_indexes = dp.randomlist(matrix.shape[2], partition_size)
-	nodes_indexes  = range(6)
+	nodes_indexes = dp.randomlist(matrix.shape[2], partition_size)
+	#nodes_indexes  = range(6)
 	nodes_indexes.sort()
 	nodes_indexes.reverse()
 	
@@ -32,6 +32,45 @@ def partition_matrix(matrix, partition_size):
 	p2 = dp.getSubset(nodes_indexes, matrix)
 	
 	return (p2, p1)
+	
+def dir_pred(matrix6, matrix94, rotation = False, rw = False):
+	
+	if rw:
+		com6 = dp.random_walk(15631)
+	else:
+		com6 = dp.get_com(matrix6)
+
+	com94 = dp.get_com(matrix94)
+	
+	updated94 = 0
+	for ts in range(matrix6.shape[1]):
+		print ts
+		#get 2D matrix of topology at ts
+		temp = dp.returnTimeMap(ts, matrix94)
+		temp = np.swapaxes(temp,0,1)
+		temp2 = temp
+		if rotation:
+			angle_between_com = dp.angle_between_vectors(com6[ts],com94[ts])
+			for i in range(temp.shape[0]):
+				#t = temp[i]
+				temp[i] = dp.rotate_about_point(temp[i], com6[ts], angle_between_com)
+				#print t == temp[i]
+		
+		d = com6[ts] - com94[ts]
+		temp = np.add(temp, d)
+		#print temp2 == temp
+		temp = np.swapaxes(temp,0,1)
+		if ts == 0:
+			updated94 = temp
+		else:
+			updated94 = np.dstack((updated94,temp))
+	print updated94.shape
+	updated94 = np.swapaxes(updated94, 1,2)
+	print updated94.shape
+	print matrix6.shape
+	result = np.dstack((updated94, matrix6))
+	return result
+	
 
 def direction_predictor(matrix, subset = 6):
 	'''
@@ -69,8 +108,10 @@ def direction_predictor(matrix, subset = 6):
 		for node_id in range(predictions):
 			#this nodes position at previous ts
 			position = np.swapaxes(temp,0,1)[node_id]
-			position = dp.rotate_about_point(position, com94, angle_between_com)
+			#position = dp.rotate_about_point(position, com6[ts], angle_between_com)
 			position = np.add(position, dcom[ts])
+			#position = np.subtract(position, com94)
+			#position = np.add(position, com6[ts])
 			
 			
 			if node_id == 0:
