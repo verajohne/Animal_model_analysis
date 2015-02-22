@@ -13,12 +13,17 @@ HERD_SIZE = 100
 
 def update_dic(dictionary, nr_of_herds, infection_map):
 	'''Assumes flocks are of equal size.. 100 for now '''
+	
 	for i in range(nr_of_herds):
 		index0 = i*100
-		indexes = range(index0, index0 + HERD_SIZE)
 		imap = infection_map[index0:index0 + HERD_SIZE]
-		number_infected = np.bincount(imap)[1]
+		number_infected = np.bincount(imap)
+		if len(number_infected) == 1:
+			number_infected = 0
+		else:
+			number_infected = number_infected[1]
 		dictionary[i+1].append(number_infected)
+		
 	return dictionary
 
 
@@ -62,6 +67,7 @@ class Field(object):
 		1. dictionary of a mapping of herd to list of #infected/time
 		2. time till 90% of total field
 		'''
+
 		infection_map = np.zeros(self.nodes, dtype= 'int64')
 		infection_map = self.insert_infection(infection_map, 1)
 		
@@ -71,7 +77,7 @@ class Field(object):
 		dictionary = {}
 		if dic == True:
 			dictionary = self.get_infection_dic()
-		
+		print "DIC: ", dictionary
 		for ts in range(self.time_samples):
 			infection_map = self.infect(ts, infection_map)
 			
@@ -88,8 +94,6 @@ class Field(object):
 			return (time_to90, dictionary)
 		else:
 			return time_to90
-	
-		
 		
 	def infect(self, ts, infection_map):
 		'''
