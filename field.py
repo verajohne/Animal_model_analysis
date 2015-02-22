@@ -6,9 +6,22 @@ import scipy.io
 import frnnr
 import infection
 
-
 #### CONSTANTS
 INFECTION_RADIUS = 10
+HERD_SIZE = 100
+
+
+def update_dic(dictionary, nr_of_herds, infection_map):
+	'''Assumes flocks are of equal size.. 100 for now '''
+	for i in range(nr_of_herds):
+		index0 = i*100
+		indexes = rane(index0, index0 + HERD_SIZE)
+		imap = infection_map[index0:index0 + HERD_SIZE]
+		number_infected = np.bincount(l)[1]
+		dictionary[i+1].append(number_infected)
+	return dictionary
+
+
 
 class Field(object):
 	
@@ -30,6 +43,12 @@ class Field(object):
 		self.infection = infection
 		self.time_samples = flocks[0].shape[1]
 	
+	def get_infection_dic():
+		nr_of_herds = len(self.flocks)
+		dictionary = {}
+		for i in range(1, nr_of_herds + 1):
+			dictionary[i] = []
+		return dictionary
 		
 	def insert_infection(self, infection_map, n):
 		inf = random.sample(range(0,self.nodes), n)
@@ -37,36 +56,40 @@ class Field(object):
 			infection_map[i] = 1
 		return infection_map
 	
-	def run(self):
+	def run(self, dic = False):
+		'''
+		returns
+		1. dictionary of a mapping of herd to list of #infected/time
+		2. time till 90% of total field
+		'''
 		infection_map = np.zeros(self.nodes, dtype= 'int64')
 		infection_map = self.insert_infection(infection_map, 1)
 		
-		number_infected = []
+		time_to90 = -1
+		t90 = False
+		
+		dictionary = {}
+		if dic == True:
+			dictionary = self.get_infection_dic()
 		
 		for ts in range(self.time_samples):
 			infection_map = self.infect(ts, infection_map)
 			
-			#count nr infected in each herd at each time step for statistics
-			offset = 0
-			for f in range(len(self.flocks)):
-				l = infection_map[offset:(offset+self.nodes/len(self.flocks))]
-				try:
-					ni = np.bincount(l)[1]
-				except IndexError:
-					ni = 0
-				number_infected.append(ni)
-				
-				if ni >= 90:
-					break
-				
-				offset = self.nodes/len(self.flocks)
-					
-		#matrix_file = scipy.io.savemat('flock1.mat', mdict={'epi': np.array(time90[0])}, format = '5' )
-		#matrix_file = scipy.io.savemat('flock2.mat', mdict={'epi': np.array(time90[1])}, format = '5' )
-		#return [number_infected_time_1, number_infected_time_2]
-		#return [time90[0], time90[1]]
-		print number_infected
-		return number_infected
+			if dic == True:
+				dictionary = update_dic(dictionary, len(self.flocks), infection_map)
+			
+			number_infected = np.bincount(l)[1]
+			percentage_infected = number_infected /float( len(self.flocks)*HERD_SIZE )
+			if percentage_infected >= 0.90 and t90 == False:
+				time_to90 = ts
+				t90 = True
+
+		if dic == True:
+			return (time_to90, dictionary)
+		else:
+			return time_to90
+	
+		
 		
 	def infect(self, ts, infection_map):
 		'''

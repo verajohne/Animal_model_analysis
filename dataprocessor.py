@@ -8,6 +8,9 @@ Standard matrix format is [space_dimensions,time_steps, nodes]
 Mostly a set of helper functions used in scripts and other modules
 '''
 
+def splice_time(matrix, timelimit):
+	return matrix[0:2, 0:timelimit, 0:100]
+
 def merge_matrixes(matrixes):
 	result = matrixes[0]
 	for i in range(1,len(matrixes)):
@@ -32,8 +35,7 @@ def random_walk(steps):
 		result.append(temp)
 		'''
 		result.append(temp)
-	return result
-		
+	return result	
 
 def random_array_list(listlength):
 	result = []
@@ -42,7 +44,6 @@ def random_array_list(listlength):
 		a = np.array([np.random.randint(0,3000),np.random.randint(0,3000)])
 		result.append(a)
 	return result
-
 
 def partition_matrix(matrix, partition_size):
 	x = matrix[0][0]
@@ -78,8 +79,7 @@ def importMatrix(matlabName, id):
 	
 def randomlist(r, sample_size):
 	 return random.sample(range(r), sample_size)
-	
-	
+		
 def getTimeSeriesForNode(i, matrix):
 	'''
 	returns trajectory for a particular node over time

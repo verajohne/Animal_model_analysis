@@ -64,11 +64,14 @@ def dir_pred(matrix6, matrix94, rotation = False, rw = False):
 			updated94 = temp
 		else:
 			updated94 = np.dstack((updated94,temp))
-	print updated94.shape
+	#print updated94.shape
 	updated94 = np.swapaxes(updated94, 1,2)
-	print updated94.shape
-	print matrix6.shape
+	#print updated94.shape
+	#print matrix6.shape
 	result = np.dstack((updated94, matrix6))
+	
+	matrix_file = scipy.io.savemat('herd1_100.mat', mdict={'herd': result}, format = '5' )
+	
 	return result
 	
 

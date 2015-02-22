@@ -39,8 +39,8 @@ class Simulation(object):
 		data = np.concatenate((xs,ys)).reshape(2,self.nr_of_loggers)
 		l, = plt.plot([], [], 'ro')
 		#hard coded for now
-		plt.xlim(0,3300)
-		plt.ylim(0,3600)
+		plt.xlim(-1000,4000)
+		plt.ylim(-1000,4000)
 		#plt.axis([min(xs) - 10, max(xs)+10, min(ys)-10, max(ys)+10])
 		plt.xlabel('x-coordinate')
 		plt.xlabel('y-coordinate')
