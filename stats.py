@@ -43,7 +43,8 @@ def import_areaTod():
 
 def plot_cdfs(sets):
 	#set_graph()
-	c= ['-r','-b', '-g']
+	c= ['-r','-b', '-g', '-y', '-k', '-m', '-c', '#eeefff', '#FF00FF','#9900CC', '#663333', '#00FFCC','#FF9900', '#FFCC33']
+	c = c + c
 	for set,col in zip(sets,c):
 		y = set
 		x = range(len(set))
