@@ -15,7 +15,7 @@ def update_dic(dictionary, nr_of_herds, infection_map):
 	'''Assumes flocks are of equal size.. 100 for now '''
 	for i in range(nr_of_herds):
 		index0 = i*100
-		indexes = rane(index0, index0 + HERD_SIZE)
+		indexes = range(index0, index0 + HERD_SIZE)
 		imap = infection_map[index0:index0 + HERD_SIZE]
 		number_infected = np.bincount(l)[1]
 		dictionary[i+1].append(number_infected)
