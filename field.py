@@ -17,7 +17,7 @@ def update_dic(dictionary, nr_of_herds, infection_map):
 		index0 = i*100
 		indexes = range(index0, index0 + HERD_SIZE)
 		imap = infection_map[index0:index0 + HERD_SIZE]
-		number_infected = np.bincount(l)[1]
+		number_infected = np.bincount(imap)[1]
 		dictionary[i+1].append(number_infected)
 	return dictionary
 
