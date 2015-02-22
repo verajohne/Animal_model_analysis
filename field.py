@@ -73,7 +73,6 @@ class Field(object):
 			dictionary = self.get_infection_dic()
 		
 		for ts in range(self.time_samples):
-			print ts
 			infection_map = self.infect(ts, infection_map)
 			
 			if dic == True:
