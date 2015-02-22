@@ -43,7 +43,7 @@ class Field(object):
 		self.infection = infection
 		self.time_samples = flocks[0].shape[1]
 	
-	def get_infection_dic():
+	def get_infection_dic(self):
 		nr_of_herds = len(self.flocks)
 		dictionary = {}
 		for i in range(1, nr_of_herds + 1):
