@@ -73,12 +73,13 @@ class Field(object):
 			dictionary = self.get_infection_dic()
 		
 		for ts in range(self.time_samples):
+			print ts
 			infection_map = self.infect(ts, infection_map)
 			
 			if dic == True:
 				dictionary = update_dic(dictionary, len(self.flocks), infection_map)
 			
-			number_infected = np.bincount(l)[1]
+			number_infected = np.bincount(infection_map)[1]
 			percentage_infected = number_infected /float( len(self.flocks)*HERD_SIZE )
 			if percentage_infected >= 0.90 and t90 == False:
 				time_to90 = ts
