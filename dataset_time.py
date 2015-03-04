@@ -2,7 +2,11 @@ import numpy as np
 
 '''
 This is for the specific dataset of the Trajectory matrix
-Starting at 8am
+
+Plots a herd of 100 sheep
+start: 3 feb 2014 16:00
+finish: 14 feb 2014, 8:00
+sampled geolocation of each logger every minute
 '''	
 	
 def get_time_step(time, day_ts = False):

@@ -77,7 +77,7 @@ class Field(object):
 		dictionary = {}
 		if dic == True:
 			dictionary = self.get_infection_dic()
-		print "DIC: ", dictionary
+		
 		for ts in range(self.time_samples):
 			infection_map = self.infect(ts, infection_map)
 			
@@ -91,8 +91,14 @@ class Field(object):
 				t90 = True
 
 		if dic == True:
+			for key in dictionary.keys():
+				file = 'stats_herd' + str(key) + '.mat'
+				data = np.array([dictionary[key]])
+				matrix_file = scipy.io.savemat(filename, mdict={'stats': data}, format = '5' )
+		
 			return (time_to90, dictionary)
 		else:
+			matrix_file = scipy.io.savemat('time_to_90.mat', mdict={'time_to_90': np.array([time_to90])}, format = '5' )
 			return time_to90
 		
 	def infect(self, ts, infection_map):

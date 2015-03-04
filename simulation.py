@@ -24,7 +24,8 @@ class Simulation(object):
 		'''
 		
 		time = dst.get_time(time_step, only_time = True)
-		print time[0], ":", time[1]
+		#print time[0], ":", time[1]
+		print time_step
 		xs = self.logger_data[0, time_step]
 		ys = self.logger_data[1, time_step]
 		nodes = np.concatenate((xs,ys)).reshape(self.dimensions, self.nr_of_loggers)
@@ -39,13 +40,13 @@ class Simulation(object):
 		data = np.concatenate((xs,ys)).reshape(2,self.nr_of_loggers)
 		l, = plt.plot([], [], 'ro')
 		#hard coded for now
-		plt.xlim(-1000,4000)
-		plt.ylim(-1000,4000)
+		plt.xlim(-1500,5000)
+		plt.ylim(-1500,5000)
 		#plt.axis([min(xs) - 10, max(xs)+10, min(ys)-10, max(ys)+10])
 		plt.xlabel('x-coordinate')
 		plt.xlabel('y-coordinate')
 		plt.title('Sheep moving around')
 		line_ani = animation.FuncAnimation(fig1, self.update_plot, self.nr_of_samples, 
-			fargs=(data, l), interval=10, blit=False, repeat = False)
+			fargs=(data, l), interval=1, blit=False, repeat = False)
 		
 		plt.show()

@@ -46,12 +46,16 @@ def plot_cdfs(sets):
 	c= ['-r','-b', '-g', '-y', '-k', '-m', '-c', '#eeefff', '#FF00FF','#9900CC', '#663333', '#00FFCC','#FF9900', '#FFCC33']
 	c = c + c
 	for set,col in zip(sets,c):
-		y = set
-		x = range(len(set))
+		y = set[0]
+		#if len(y) == 1:
+		#	y = y[0]
+		x = range(len(set[0]))
 		plt.plot(x, y, col)
 	
 	plt.ylabel('% infected in each flock')
 	plt.xlabel('Time (sec)')
+	plt.xlim(0,5000)
+	plt.ylim(0,100)
 	#x_ticks = [dst.toString(dst.get_time(0)), dst.toString(dst.get_time(1000)),dst.toString(dst.get_time(2000)),dst.toString(dst.get_time(3000)),dst.toString(dst.get_time(4000)), dst.toString(dst.get_time(5000)), dst.toString(dst.get_time(6000)), dst.toString(dst.get_time(7000))]
 	#plt.xticks([0, 1000, 2000, 3000, 4000, 5000,6000,7000], x_ticks)
 	#locs, labels = plt.xticks()

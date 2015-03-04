@@ -8,8 +8,8 @@ Standard matrix format is [space_dimensions,time_steps, nodes]
 Mostly a set of helper functions used in scripts and other modules
 '''
 
-def splice_time(matrix, timelimit):
-	return matrix[0:2, 0:timelimit, 0:100]
+def splice_time(matrix, t0, t1):
+	return matrix[0:2, t0:t1, 0:100]
 
 def merge_matrixes(matrixes):
 	result = matrixes[0]
@@ -109,28 +109,26 @@ def getListPoints(x,y):
 	return points
 
 def angle_between_vectors(v,u):
+	'''
+	angle between v,u
+	return difference of anticlockwise rotation v needs to rotate to equal u
+	'''
 	angle_v = vector_to_angle(v)
 	angle_u = vector_to_angle(u)
-	
-	cosine_of_angle = np.dot(v,u)/np.linalg.norm(v)/np.linalg.norm(u) #check if this will be decimal division
-	angle = np.arccos(cosine_of_angle)
-	if np.isnan(angle):
-		if (v == u).all():
-			angle = 0.0
-		else:
-			angle = np.pi
-	if angle_v < angle_u: #??? should i do this?
-		angle = -angle
-	
-	return angle
+	diff = angle_u - angle_v
+	return diff
+
 
 def rotate(vector, angle):
-	#rotates clockwise
+	#rotates anti clockwise about origin
 	transition_matrix = np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]])
 	new_vector = np.dot(vector, transition_matrix)
 	return new_vector
 
 def rotate_about_point(vector, rotation_vector, angle):
+	'''
+	rotate about rotation_vector
+	'''
 	v = np.subtract(vector, rotation_vector)
 	v = rotate(v, angle)
 	v = np.add(v, rotation_vector)
