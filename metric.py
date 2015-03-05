@@ -2,7 +2,12 @@ import numpy as np
 import scipy.io as sio
 import scipy as sp
 from sklearn.neighbors import NearestNeighbors
+from scipy.spatial import ConvexHull
+import random
+
 import dataprocessor as dp
+import infection
+import field
 
 '''
 Metrics for KS tests
@@ -10,7 +15,7 @@ Metrics for KS tests
 1. Mean distance to nearest neighbor per time
 2. com100-com6 per time
 3. convehhull per time
-
+4. time to 90% infection
 '''
 def polygon_area(vertices):
 	'''
@@ -42,7 +47,7 @@ def avg_knn(trajectory, K):
 	mean_distances_to_KNN = []
 	samples = trajectory.shape[2]
 	for ts in range(trajectory.shape[1]):
-		print ts
+	#for ts in range(10):
 		xs = trajectory[0, ts]
 		ys = trajectory[1, ts]
 		points = np.array(getListPoints(xs,ys))
@@ -54,29 +59,35 @@ def avg_knn(trajectory, K):
 		mean_d = sum(distances_to_kth)/float(samples)
 		mean_distances_to_KNN.append(mean_d)
 	
-	return np.array(mean_distances_to_KNN)
+	return mean_distances_to_KNN
 
 def diff_com(trajectory):
-	six_loggers = random.sample(range(self.nr_of_loggers), 6)
+	six_loggers = random.sample(range(100), 6)
 	diff_com = []
 	for ts in range(trajectory.shape[1]):
+	#for ts in range(10):
 		com6 = np.zeros(2)
 		for log in six_loggers:
-			com6 += np.array([self.logger_data[0,ts,log], self.logger_data[1,ts,log]])
+			com6 += np.array([trajectory[0,ts,log], trajectory[1,ts,log]])
 		com6 = com6/float(6)
 		xs = np.mean(trajectory[0, ts])
 		ys = np.mean(trajectory[1, ts])
 		comF = np.array([xs,ys])
-		diff_com.append(abs(comF-com6))
+		distance = np.linalg.norm(comF-com6)
+		diff_com.append(distance)
 	
 	return diff_com
 		
 def convexhull(trajectory):
+	'''
+	convex hull at each timestep
+	'''
 	ch = []
 	
 	for ts in range(trajectory.shape[1]):
-		xs = self.logger_data[0,ts]
-		ys = self.logger_data[1,ts]
+	#for ts in range(10):
+		xs = trajectory[0,ts]
+		ys = trajectory[1,ts]
 		pointsF = zip(xs,ys)
 		hull = ConvexHull(pointsF)
 		vertex_indexes = hull.vertices
@@ -88,29 +99,50 @@ def convexhull(trajectory):
 	
 	return ch
 
+def infection_analysis(trajectory, p,d, runs):
+	result = []
+	i = infection.Infection(p, d)
+	f = field.Field([trajectory], i)
+	for i in range(runs):
+		time = f.run()
+		result.append(time)
+	return np.array(result)
+
 def main():
-	trajectory = sio.loadmat('../matrixes/trajectory.mat')['trajectory']
-	result = []
-	for i in range(100):
-		l = avg_knn(trajectory,1)
-		result = result + l
-	result = np.array(result)
-	matrix_file = scipy.io.savemat('knnD1.mat', mdict={'stats': result}, format = '5' )
+	for j in range(1,15):
+		filename = '../pred_matrix/herd' + str(j) + '_100.mat'
+		trajectory = sio.loadmat(filename)['herd']
+	
+		result = []
+		for i in range(100):
+			l = avg_knn(trajectory,1)
+			result = result + l
+		result = np.array(result)
+		n = '../metric_stuff/knn_herd' +str(j) + '.mat' 
+		matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
 	
 	
-	result = []
-	for i in range(100):
-		l = diff_com(trajectory)
-		result = result + l
-	result = np.array(result)
-	matrix_file = scipy.io.savemat('diffcomD1.mat', mdict={'stats': result}, format = '5' )
+		result = []
+		for i in range(100):
+			print i
+			l = diff_com(trajectory)
+			result = result + l
+		result = np.array(result)
+		n = '../metric_stuff/diffcom_herd' +str(j) + '.mat' 
+		matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
 	
-	result = []
-	for i in range(100):
-		l = convexhull(trajectory)
-		result = result + l
-	result = np.array(result)
-	matrix_file = scipy.io.savemat('convexhullD1.mat', mdict={'stats': result}, format = '5' )
+		result = []
+		for i in range(100):
+			l = convexhull(trajectory)
+			result = result + l
+		result = np.array(result)
+		n = '../metric_stuff/convexhullherd' +str(j) + '.mat' 
+		matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+		
+		#infection
+		result = infection_analysis(trajectory, 0.2,1,100)
+		n = '../metric_stuff/infection_herd' +str(j) + '.mat' 
+		matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
 	
 	
 
