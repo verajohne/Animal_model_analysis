@@ -104,11 +104,24 @@ def infection_analysis(trajectory, p,d, runs):
 	i = infection.Infection(p, d)
 	f = field.Field([trajectory], i)
 	for i in range(runs):
+		print i
 		time = f.run()
 		result.append(time)
 	return np.array(result)
 
 def main():
+	trajectory = sio.loadmat('../pred_matrix/trajectory10.mat')['trajectory']
+	result = infection_analysis(trajectory, 0.2,1,100)
+	n = '../metric_stuff/infection_herd' +str(j) + '.mat' 
+	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+	
+	filename = '../pred_matrix/herd' + str(5) + '_100.mat'
+	trajectory = sio.loadmat(filename)['herd']
+	result = infection_analysis(trajectory, 0.2,1,100)
+	n = '../metric_stuff/infection_herd' +str(5) + '.mat' 
+	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+	
+	'''
 	for j in range(1,15):
 		filename = '../pred_matrix/herd' + str(j) + '_100.mat'
 		trajectory = sio.loadmat(filename)['herd']
@@ -143,7 +156,7 @@ def main():
 		result = infection_analysis(trajectory, 0.2,1,100)
 		n = '../metric_stuff/infection_herd' +str(j) + '.mat' 
 		matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
-	
+		'''
 	
 
 if __name__ == '__main__':

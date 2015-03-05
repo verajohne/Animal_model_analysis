@@ -11,6 +11,13 @@ For plotting of data (pdf)
 Some of these functions are particular to my dataset
 '''
 
+def plot_cdf(lists):
+	for list in lists:
+		sorted=np.sort(list)
+		yvals=np.arange(len(sorted))/float(len(sorted))
+		plt.plot( sorted, yvals )
+	
+	plt.show()
 
 def import_data(file, ds):
 	data = scipy.io.loadmat(file)
