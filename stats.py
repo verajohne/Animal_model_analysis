@@ -62,7 +62,6 @@ def plot_cdfs(sets):
 	#plt.setp(labels, rotation=45)
 	plt.show()
 	
-	
 def set_graph():
 	sns.set_palette("deep", desat = .6)
 	sns.set_context(rc = {"figure.figsize":(8,4)})
@@ -91,7 +90,6 @@ def kde(data):
 	sns.kdeplot(data, shade=True)
 	plt.axvline(np.mean(data), color='r', linestyle='dashed', linewidth=2)
 	plt.show()
-	
 
 def shist(x, bins):
 	mean = np.mean(x)
@@ -116,3 +114,4 @@ def shist(x, bins):
 	ax.set_xticklabels(x_labels)                                                     
 
 	plt.show() 
+	
