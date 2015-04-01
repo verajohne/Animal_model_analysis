@@ -10,7 +10,7 @@ import infection
 import field
 
 '''
-Metrics for KS tests
+Metrics for KS tests to evaluate models
 
 1. Mean distance to nearest neighbor per time
 2. com100-com6 per time
@@ -110,6 +110,49 @@ def infection_analysis(trajectory, p,d, runs):
 	return np.array(result)
 
 def main():
+
+	trajectory0 = sio.loadmat('../basematrixes/trajectory0.mat')['trajectory']
+	trajectory10s = sio.loadmat('../basematrixes/trajectory10s.mat')['trajectory']
+	markov1 = sio.loadmat('../markov/markov1.mat')['trajectory']
+	
+	result = infection_analysis(markov1,0.02,1,100)
+	matrix_file = sio.savemat('../metric_stuff/infection_markov1.mat', mdict={'stats': result}, format = '5' )
+	
+	'''
+	result = []
+	for i in range(100):
+		print i
+		ch = diff_com(markov1)
+		result = result + ch
+	result = np.array(result)
+	n = '../metric_stuff/dcom_markov1.mat' 
+	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+	
+
+	
+	
+	
+	
+	result = []
+	for i in range(100):
+		print i
+		ch = convexhull(markov1)
+		result = result + ch
+	result = np.array(result)
+	n = '../metric_stuff/ch_markov1.mat' 
+	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+
+	result = []
+	for i in range(100):
+		print i
+		ch = convexhull(trajectory10s)
+		result = result + ch
+	result = np.array(result)
+	n = '../metric_stuff/ch_trajectory10s.mat' 
+	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
+	
+	
+
 	trajectory = sio.loadmat('../pred_matrix/trajectory10.mat')['trajectory']
 	result = infection_analysis(trajectory, 0.2,1,100)
 	n = '../metric_stuff/infection_herd' +str(j) + '.mat' 
@@ -121,7 +164,7 @@ def main():
 	n = '../metric_stuff/infection_herd' +str(5) + '.mat' 
 	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
 	
-	'''
+	
 	for j in range(1,15):
 		filename = '../pred_matrix/herd' + str(j) + '_100.mat'
 		trajectory = sio.loadmat(filename)['herd']

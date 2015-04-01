@@ -4,37 +4,18 @@ import scipy.io
 import dataprocessor as dp
 
 '''
-1. start with 8am on day 1 topology
-2. given data for 6 random
+given sample data for a heard (i.e. 6 nodes),
+use data for flock of 100 to project around 6
+output is a new trajectory matrix of 100 nodes based on
 
 '''
 
-def get_ch_flock(ch):
-	return 13*ch
-
-def get_com_flock(com):
-	return com
-
-def partition_matrix(matrix, partition_size):
-	x = matrix[0][0]
-	y = matrix[1][0]
-	
-	nodes_indexes = dp.randomlist(matrix.shape[2], partition_size)
-	#nodes_indexes  = range(6)
-	nodes_indexes.sort()
-	nodes_indexes.reverse()
-	
-	for i in nodes_indexes:
-		x = np.delete(x,i)
-		y = np.delete(y,i)
-		
-	p1 = np.vstack((x,y))
-	p2 = dp.getSubset(nodes_indexes, matrix)
-	
-	return (p2, p1)
-	
 def dir_pred(matrix6, matrix94, rotation = False, rw = False):
-	
+	'''
+	rw = random walk
+	-option to feed in a list of a random walk to act as com/trajectory path of herd
+	-mainly for testing
+	'''
 	if rw:
 		com6 = dp.random_walk(15631)
 	else:
@@ -53,7 +34,6 @@ def dir_pred(matrix6, matrix94, rotation = False, rw = False):
 			for i in range(temp.shape[0]):
 				temp[i] = dp.rotate_about_point(temp[i], com6[ts], angle_between_com)
 		
-		
 		d = com6[ts] - com94[ts]
 		temp = np.add(temp, d)
 	
@@ -62,13 +42,10 @@ def dir_pred(matrix6, matrix94, rotation = False, rw = False):
 			updated94 = temp
 		else:
 			updated94 = np.dstack((updated94,temp))
-	#print updated94.shape
+
 	updated94 = np.swapaxes(updated94, 1,2)
-	#print updated94.shape
-	#print matrix6.shape
+
 	result = np.dstack((updated94, matrix6))
-	
-	matrix_file = scipy.io.savemat('herd1_100.mat', mdict={'herd': result}, format = '5' )
 	
 	return result
 	

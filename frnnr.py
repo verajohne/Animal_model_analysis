@@ -16,6 +16,12 @@ class frnnr(object):
 		self.points = p
 		self.dict = {}
 		self.prepare_dict()
+
+	def prepare_dict(self):
+		#set up dictionary
+		
+		for p in self.points:
+			self.insert(p)
 		
 	def getBucket(self,point):
 		point = point.astype(int)
@@ -36,13 +42,6 @@ class frnnr(object):
 		else:
 			return []
 	
-	def prepare_dict(self):
-		#set up dictionary
-		
-		for p in self.points:
-			self.insert(p)
-			
-	
 	def return_nodes_inrange_to_check(self, point):
 		'''
 		returns points in bucket and all neighboring buckets
@@ -61,8 +60,7 @@ class frnnr(object):
 				nodes = nodes + self.find(b)
 		
 		return nodes
-		
-		
+			
 	def get_distances(self, point):
 	
 		nodes = self.return_nodes_inrange_to_check(point)

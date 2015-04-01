@@ -40,12 +40,12 @@ class Simulation(object):
 		data = np.concatenate((xs,ys)).reshape(2,self.nr_of_loggers)
 		l, = plt.plot([], [], 'ro')
 		#hard coded for now
-		plt.xlim(-1500,5000)
-		plt.ylim(-1500,5000)
+		plt.xlim(0,4000)
+		plt.ylim(0,4000)
 		#plt.axis([min(xs) - 10, max(xs)+10, min(ys)-10, max(ys)+10])
 		plt.xlabel('x-coordinate')
 		plt.xlabel('y-coordinate')
-		plt.title('Sheep moving around')
+		plt.title('Sheep Simulation')
 		line_ani = animation.FuncAnimation(fig1, self.update_plot, self.nr_of_samples, 
 			fargs=(data, l), interval=1, blit=False, repeat = False)
 		

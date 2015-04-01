@@ -7,16 +7,25 @@ import scipy.io
 import dataset_time as dst
 
 '''
-For plotting of data (pdf)
-Some of these functions are particular to my dataset
+For plotting of data
+Some of these functions are particular to the structure of the dataset
 '''
 
 def plot_cdf(lists):
-	for list in lists:
+	c = ['-g','-b']
+	for list,col in zip(lists,c):
 		sorted=np.sort(list)
-		yvals=np.arange(len(sorted))/float(len(sorted))
-		plt.plot( sorted, yvals )
+		
+		yvals=np.arange(sorted.shape[0])/float(sorted.shape[0])
+		plt.plot( sorted, yvals, col )
 	
+	plt.xlim(-10,50)
+	#plt.xlim(0,0.5*10**3)
+	plt.ylabel('CDF')
+	plt.xlabel('Step size')
+	plt.title('CDF of step size (10 minute samples)')
+	#plt.text(1000, 0.1, 'Original Trajectory 1min (trajectory0)', verticalalignment='bottom', horizontalalignment='right', color='green', fontsize=10)
+	#plt.text(1000, 0.2, 'Markov model',verticalalignment='bottom', horizontalalignment='right', color='blue', fontsize=10)
 	plt.show()
 
 def import_data(file, ds):
@@ -67,6 +76,10 @@ def plot_cdfs(sets):
 	#plt.xticks([0, 1000, 2000, 3000, 4000, 5000,6000,7000], x_ticks)
 	#locs, labels = plt.xticks()
 	#plt.setp(labels, rotation=45)
+	plt.show()
+
+def plot(matrix):
+	plt.scatter(matrix[0],matrix[1], c = 'r')
 	plt.show()
 	
 def set_graph():
