@@ -8,13 +8,21 @@ Standard matrix format is [space_dimensions,time_steps, nodes]
 Mostly a set of helper functions used in scripts and other modules
 '''
 
-def splice_time(matrix, t0, t1):
+def slice_time(matrix, t0, t1):
+	'''
+	return subset of time interval: [t0,t1]
+	'''
 	return matrix[0:2, t0:t1, 0:100]
 
-def merge_matrixes(matrixes):
-	result = matrixes[0]
-	for i in range(1,len(matrixes)):
-		result = np.dstack((result, matrixes[i]))
+def merge_matrixes(list_of_trajectories):
+	'''
+	trajectories in list must have same time dimension
+	returns one big trajectory matrix combined of all trajectories in list_of_trajectories
+	usually for simulate multiple trajectory matrixes in Simulation class
+	'''
+	result = list_of_trajectories[0]
+	for i in range(1,len(list_of_trajectories)):
+		result = np.dstack((result, list_of_trajectories[i]))
 	return result
 
 def random_walk(steps):
@@ -37,7 +45,7 @@ def random_walk(steps):
 		result.append(temp)
 	return result	
 
-def random_array_list(listlength):
+def random_array_list(listlength): #???
 	result = []
 	step_size = 0.5
 	for i in range(listlength):
@@ -45,24 +53,25 @@ def random_array_list(listlength):
 		result.append(a)
 	return result
 
-def partition_matrix(matrix, partition_size):
-	x = matrix[0][0]
-	y = matrix[1][0]
+def partition_matrix(trajectory, partition_size):
+	'''
+	returns two trajectories
+	'''
+	x = trajectory[0][0]
+	y = trajectory[1][0]
 	
-	set1_indexes = randomlist(matrix.shape[2], partition_size)
-	set2_indexes = [x for x in range(matrix.shape[2]) if x not in set1_indexes]
-	matrix1 = getSubset(set1_indexes, matrix)
-	matrix2 = getSubset(set2_indexes, matrix)
+	set1_indexes = randomlist(trajectory.shape[2], partition_size)
+	set2_indexes = [x for x in range(trajectory.shape[2]) if x not in set1_indexes]
+	trajectory1 = getSubset(set1_indexes, trajectory)
+	trajectory2 = getSubset(set2_indexes, trajectory)
 	
-	return [matrix1, matrix2]
+	return [trajectory1, trajectory2]
 
-def returnTimeMap(ts, matrix):
+def returnTimeMap(ts, trajectory):
 	'''
 	returns 2D matrix image of points at particular timestep
 	'''
-	x = matrix[0][ts]
-	y = matrix[1][ts]
-	return np.vstack((x,y))
+	return trajectory.swapaxes(0,1)[ts]
 	
 def importData():
 	'''
@@ -72,13 +81,17 @@ def importData():
 	trajectory = trajectory_mat['trajectory']
 	return trajectory
 	
-def importMatrix(matlabName, id):
-	trajectory_mat = scipy.io.loadmat(matlabName)
+def importMatrix(path, id):
+	trajectory_mat = scipy.io.loadmat(path)
 	trajectory = trajectory_mat[id]
 	return trajectory
 	
 def randomlist(r, sample_size):
-	 return random.sample(range(r), sample_size)
+	'''
+	r > sample_size
+	return list of random numbers
+	'''
+	return random.sample(range(r), sample_size)
 		
 def getTimeSeriesForNode(i, matrix):
 	'''
@@ -118,7 +131,6 @@ def angle_between_vectors(v,u):
 	diff = angle_u - angle_v
 	return diff
 
-
 def rotate(vector, angle):
 	#rotates anti clockwise about origin
 	transition_matrix = np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]])
@@ -139,6 +151,9 @@ def com(matrix):
 	return np.array([np.mean(matrix[0]), np.mean(matrix[1])])
 
 def get_com(matrix):
+	'''
+	returns a list of com
+	'''
 	com = []
 	for ts in range(matrix.shape[1]):
 		xs = np.mean(matrix[0, ts])
@@ -203,6 +218,19 @@ def vector_to_angle(vector):
 				phi = phi + 2*np.pi
 	return phi
 
+def position_matrix_around_new_center(matrix, center):
+	'''
+	matrix should be a 2 X N matrix
+	center should be a (x,y) array
+	'''
+	x = matrix[0] - center[0]
+	y = matrix[1] - center[1]
+	return np.vstack([x,y])
+
+def angle_to_unit_vector(angle):
+	return np.array([np.cos(angle), np.sin(angle)])
+	
+		
 
 
 

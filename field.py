@@ -7,6 +7,10 @@ import frnnr
 import infection
 
 #### CONSTANTS
+'''
+infection_radius defines maximum distance between to nodes
+for an infection to be possible
+'''
 INFECTION_RADIUS = 10
 HERD_SIZE = 100
 
@@ -32,8 +36,9 @@ class Field(object):
 	
 	def __init__(self, flocks, infection):
 		'''
-		flocks are just 3D matrices of flock trajectory per time
-		right now assumes flocks are equal size
+		flocks are the standard trajectory format
+		Assumes flocks are of equal size
+		flocks is a list of trajectories
 		'''
 		self.flocks = flocks
 		
