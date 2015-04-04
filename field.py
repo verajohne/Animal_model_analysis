@@ -1,22 +1,21 @@
 from __future__ import division
 import numpy as np
 import random
-import scipy.io
+
 
 import frnnr
 import infection
 
 #### CONSTANTS
-'''
-infection_radius defines maximum distance between to nodes
-for an infection to be possible
-'''
-INFECTION_RADIUS = 10
 HERD_SIZE = 100
 
 
 def update_dic(dictionary, nr_of_herds, infection_map):
-	'''Assumes flocks are of equal size.. 100 for now '''
+	'''
+	Assumes flocks are of equal size.
+	Dictionary maps herd id to number of infected per time update_dic is called.
+	Each herd_id, i, maps to a list of number of infected per time step.
+	'''
 	
 	for i in range(nr_of_herds):
 		index0 = i*100
@@ -29,8 +28,6 @@ def update_dic(dictionary, nr_of_herds, infection_map):
 		dictionary[i+1].append(number_infected)
 		
 	return dictionary
-
-
 
 class Field(object):
 	
@@ -52,6 +49,11 @@ class Field(object):
 		self.points = points
 		self.infection = infection
 		self.time_samples = flocks[0].shape[1]
+		'''
+		infection_radius defines maximum distance between to nodes
+		for an infection to be possible
+		'''
+		self.infection_radius = np.sqrt(infection.p*(infection.d**2)/0.001)
 	
 	def get_infection_dic(self):
 		nr_of_herds = len(self.flocks)
@@ -69,8 +71,9 @@ class Field(object):
 	def run(self, dic = False):
 		'''
 		returns
-		1. dictionary of a mapping of herd to list of #infected/time
-		2. time till 90% of total field
+		1. dictionary of a mapping of herd to list of #infected/time (dic=True)
+		2. time till 90% of total field infected
+		returns -1 if 90% of flock failed to be infected.
 		'''
 
 		infection_map = np.zeros(self.nodes, dtype= 'int64')
@@ -103,7 +106,6 @@ class Field(object):
 		
 			return (time_to90, dictionary)
 		else:
-			#matrix_file = scipy.io.savemat('time_to_90.mat', mdict={'time_to_90': np.array([time_to90])}, format = '5' )
 			return time_to90
 		
 	def infect(self, ts, infection_map):
@@ -129,9 +131,11 @@ class Field(object):
 		for i in infected_indexes:
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])
 			infected_points.append(p)
-		
-		#Get points within INFECTION RADIUS through fixed neighbour reporting
-		f = frnnr.frnnr(INFECTION_RADIUS, infected_points)
+		'''
+		Get points within INFECTION RADIUS through fixed neighbour reporting
+		Only check node compared to infected nodes
+		'''
+		f = frnnr.frnnr(self.infection_radius, infected_points)
 		for i in not_infected_indexes:
 			#get an uninfected node
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])

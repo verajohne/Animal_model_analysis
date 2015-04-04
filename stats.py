@@ -12,7 +12,8 @@ Some of these functions are particular to the structure of the dataset
 '''
 
 def plot_cdf(lists):
-	c = ['-g','-b']
+	#c = ['-g','-b']
+	c= ['-r','-b', '-g', '-y', '-k', '-m', '-c', '#fe677f', '#FF00FF','#9900CC', '#663333', '#00FFCC','#FF9900', '#FFCC33']
 	for list,col in zip(lists,c):
 		sorted=np.sort(list)
 		
@@ -21,9 +22,9 @@ def plot_cdf(lists):
 	
 	plt.xlim(-10,50)
 	#plt.xlim(0,0.5*10**3)
-	plt.ylabel('CDF')
-	plt.xlabel('Step size')
-	plt.title('CDF of step size (10 minute samples)')
+	plt.ylabel('Proportion of flock infected')
+	plt.xlabel('Time')
+	plt.title('Field of 14 flocks starting with one infected sheet (p = 0.2, d = 1')
 	#plt.text(1000, 0.1, 'Original Trajectory 1min (trajectory0)', verticalalignment='bottom', horizontalalignment='right', color='green', fontsize=10)
 	#plt.text(1000, 0.2, 'Markov model',verticalalignment='bottom', horizontalalignment='right', color='blue', fontsize=10)
 	plt.show()
@@ -79,7 +80,11 @@ def plot_cdfs(sets):
 	plt.show()
 
 def plot(matrix):
-	plt.scatter(matrix[0],matrix[1], c = 'r')
+	#plt.scatter(matrix[0],matrix[1], c = 'r')
+	plt.xlabel('Time')
+	plt.ylabel('Number Infected')
+	plt.title('Number infected per time for Trajectory0 (1 min samples)')
+	plt.plot( matrix[0], matrix[1], '-g' )
 	plt.show()
 	
 def set_graph():
@@ -102,13 +107,19 @@ def histogram(x, bins = 10, rp = False, weights = True, normed = False):
 		plt.hist(x, bins = bins, weights = weights)
 	else:
 		plt.hist(x, bins = bins, normed = normed)
-		
+	plt.ylabel('Normalized probability')
+	plt.xlabel('Difference in convex hull area')
+	plt.xlim(0,3500000)
+	plt.ylim(0,0.35)
 	plt.axvline(np.mean(x), color='r', linestyle='dashed', linewidth=2)
 	plt.show()
 
 def kde(data):
 	sns.kdeplot(data, shade=True)
 	plt.axvline(np.mean(data), color='r', linestyle='dashed', linewidth=2)
+	plt.ylabel('Normalized probability')
+	plt.xlabel('Difference in COM')
+	#plt.title('100 samples of Trajectory0 (1 min samples')
 	plt.show()
 
 def shist(x, bins):

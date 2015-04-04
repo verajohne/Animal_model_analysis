@@ -16,7 +16,7 @@ class Infection(object):
 		if distance == 0:
 			distance = 0.01	
 		c = self.p*(self.d)**2
-		return c/(dis**2)
+		return c/(distance**2)
 	
 	def infect(self, distance):
 		p = self.prob_of_infection(distance)
