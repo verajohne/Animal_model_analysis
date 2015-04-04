@@ -99,15 +99,24 @@ def convexhull(trajectory):
 	
 	return ch
 
-def infection_analysis(trajectory, p,d, runs):
+def infection_analysis(trajectory_list, p,d, runs):
 	result = []
 	i = infection.Infection(p, d)
-	f = field.Field([trajectory], i)
+	f = field.Field(trajectory_list, i)
 	for i in range(runs):
 		print i
 		time = f.run()
 		result.append(time)
 	return np.array(result)
+
+def leave_one_out_analysis(list_of_herd_trajectories, p,d):
+	herds = len(list_of_herd_trajectories)
+	for i in range(herds):
+		list = herds[:i] + herds[i+1 :]
+		result = infection_analysis(list, p,d,100)
+		fn = 'LO_herd' + str(i+1) + '.mat'
+		matrix_file = sio.savemat(fn, mdict={'stats': result}, format = '5' )
+
 
 def main():
 
@@ -155,7 +164,7 @@ def main():
 
 	trajectory = sio.loadmat('../pred_matrix/trajectory10.mat')['trajectory']
 	result = infection_analysis(trajectory, 0.2,1,100)
-	n = '../metric_stuff/infection_herd' +str(j) + '.mat' 
+	n = '../metric_stuff/infection_d3.mat' 
 	matrix_file = sio.savemat(n, mdict={'stats': result}, format = '5' )
 	
 	filename = '../pred_matrix/herd' + str(5) + '_100.mat'
