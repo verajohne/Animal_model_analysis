@@ -54,6 +54,7 @@ class Field(object):
 		for an infection to be possible
 		'''
 		self.infection_radius = np.sqrt(infection.p*(infection.d**2)/0.001)
+		#self.infection_radius = 15
 	
 	def get_infection_dic(self):
 		nr_of_herds = len(self.flocks)
@@ -87,6 +88,7 @@ class Field(object):
 			dictionary = self.get_infection_dic()
 		
 		for ts in range(self.time_samples):
+			
 			infection_map = self.infect(ts, infection_map)
 			
 			if dic == True:
@@ -122,7 +124,7 @@ class Field(object):
 				infected_indexes.append(i)
 			else:
 				not_infected_indexes.append(i)
-
+		
 		#all coordinate points at ts
 		x = self.points[0][ts]
 		y = self.points[1][ts]
@@ -141,6 +143,7 @@ class Field(object):
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])
 			#get list of distances to nearby infect-able nodes from uninfected node
 			distances = f.get_distances(p)
+			
 			for d in distances:
 				inf = self.infection.infect(d)
 				if inf == 1:

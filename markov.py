@@ -1,7 +1,7 @@
 import dataprocessor as dp
 import numpy as np
 import random
-
+import copy
 import scipy.io as sio
 
 '''
@@ -75,7 +75,7 @@ def get_transformation(mp):
 	elif p < mp[1] + mp[2] + mp[3] + mp[4] + mp[5]:
 		angle = 4*np.pi/float(3) + a
 	else:
-		angle = 4*np.pi/float(3) + a
+		angle = 5*np.pi/float(3) + a
 	vector = dp.angle_to_unit_vector(angle)
 	return vector
 		
@@ -90,7 +90,7 @@ def create_markov_trajectory(initial_position, time, mp = None):
 		mp = get_markov_probabilities(trajectory0)
 	
 	trajectory = initial_position.swapaxes(0,1)
-	p0 = trajectory
+	p0 = copy.deepcopy(trajectory)
 	for ts in range(1,time):
 		#print ts
 		com = dp.com(p0.swapaxes(0,1))
@@ -105,7 +105,7 @@ def create_markov_trajectory(initial_position, time, mp = None):
 			pt = pt + com
 			p0[i] = pt
 	
-		trajectory = np.dstack((trajectory,p0))
+		trajectory = np.dstack((trajectory,p0.copy()))
 	
 	trajectory = trajectory.swapaxes(0,1)
 	trajectory = trajectory.swapaxes(1,2)

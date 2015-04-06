@@ -71,7 +71,8 @@ def returnTimeMap(ts, trajectory):
 	'''
 	returns 2D matrix image of points at particular timestep
 	'''
-	return trajectory.swapaxes(0,1)[ts]
+	#return trajectory.swapaxes(0,1)[ts]
+	return np.array([trajectory[0][ts], trajectory[1][ts]])
 	
 def importData():
 	'''

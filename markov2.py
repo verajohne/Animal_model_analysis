@@ -5,6 +5,7 @@ import random
 
 import scipy.io as sio
 
+
 '''
 Similar to markov 1
 except space is split into discrete hexagons
@@ -17,9 +18,11 @@ except space is split into discrete hexagons
 the sheep moves within this radius we consider it as non moving/stationary
 '''
 
-STATIONARY_RADIUS = 0.5
-MEAN_STEP_SIZE = 10
-HEXAGON_RADIUS = 1.5*MEAN_STEP_SIZE
+STATIONARY_RADIUS = 0.1
+
+R = 1
+
+#UPPER = 7
 
 
 def get_markov_probabilities(trajectory):
@@ -34,6 +37,7 @@ def get_markov_probabilities(trajectory):
 	for i in range(-1,7):
 		markov_space_count[i] = 0
 	
+	distances = []
 	for ts in range(trajectory.shape[1] - 1):
 		#get positions at time ts and ts+1
 		positions0 = dp.returnTimeMap(ts, trajectory)
@@ -50,14 +54,14 @@ def get_markov_probabilities(trajectory):
 		
 		for p in delta_pos:	
 			distance = np.linalg.norm(p - np.zeros(2))
-	
+			distances.append(distance)
 			angle = dp.vector_to_angle(p)
 			
 			if distance < STATIONARY_RADIUS:
 				markov_space_count[0] += 1
 			
-			elif distance < HEXAGON_RADIUS: #just treating as circle right now
-				markov_space_count[-1]
+			elif distance < R: #just treating as circle right now
+				markov_space_count[-1] +=1
 			
 			#which hexagon to move to
 			elif angle <= np.pi/float(3):
@@ -78,12 +82,11 @@ def get_markov_probabilities(trajectory):
 			
 	return markov_space_count
 
-def get_transformation(mp):
+def get_transformation(mp, step_size = None):
 	'''
 	return transition vector
 	given the hexagon to move to and a random position within that hexagon
 	'''
-	
 	p = random.random()
 	a = random.uniform(0,np.pi/3)
 	angle = 0
@@ -91,7 +94,8 @@ def get_transformation(mp):
 	if p < mp[-1]:
 		#move random within current hexagon
 		angle = random.uniform(0,2*np.pi)
-		d = random.uniform(STATIONARY_RADIUS,HEXAGON_RADIUS)
+		d = random.uniform(STATIONARY_RADIUS,R)
+		#d = np.random.choice(step_size)
 	elif p < mp[-1] + mp[0]:
 		#stay in position
 		return np.zeros(2)
@@ -111,39 +115,46 @@ def get_transformation(mp):
 	elif p < mp[-1] + mp[0] + mp[1] + mp[2] + mp[3] + mp[4] + mp[5]:
 		angle = 4*np.pi/float(3) + a
 	else:
-		angle = 4*np.pi/float(3) + a
+		angle = 5*np.pi/float(3) + a
 	if d == 0:
-		d = random.uniform(HEXAGON_RADIUS,2*HEXAGON_RADIUS)
+		#d = random.uniform(STATIONARY_RADIUS,UPPER)
+		d = np.random.choice(step_size)
 	vector = d*dp.angle_to_unit_vector(angle)
+
 	return vector
 
-def create_markov_trajectory(initial_position, time, mp = None):
+def create_markov_trajectory(initial_position, time, mp = None, step_size = None):
 	'''
 	given a 2D matrix create a trajectory for time
 	using markov probabilities
 	'''
+	if step_size == None:
+		step_size = sio.loadmat('metric_stuff/step_size_traj0.mat')['stats'][0]
+		v = np.percentile(step_size, 90)
+		step_size = [x for x in step_size if x < v]
+	
 	if mp == None:
 		#1 minute
 		trajectory0 = sio.loadmat('../basematrixes/trajectory0.mat')['trajectory']
 		mp = get_markov_probabilities(trajectory0)
 	
 	trajectory = initial_position.swapaxes(0,1)
-	p0 = trajectory
+	p0 = initial_position.swapaxes(0,1)
 	for ts in range(1,time):
-		#print ts
-		com = dp.com(p0.swapaxes(0,1))
-		
+		#com = dp.com(p0.swapaxes(0,1))
+		com = dp.com(p0.transpose())
+		print ts
 		for i in range(p0.shape[0]):
-			
-			#the transformation if 	relative to COM
-			v = get_transformation(mp)
+			#the transformation is	relative to COM
+			v = get_transformation(mp, step_size)
 			#p0[i] = np.add(p0[i], v)
 			pt = p0[i] - com
 			pt = np.add(pt, v)
 			pt = pt + com
 			p0[i] = pt
 	
-		trajectory = np.dstack((trajectory,p0))
+		trajectory = np.dstack((trajectory,p0.copy()))
+		
 	
 	trajectory = trajectory.swapaxes(0,1)
 	trajectory = trajectory.swapaxes(1,2)

@@ -83,7 +83,7 @@ def plot(matrix):
 	#plt.scatter(matrix[0],matrix[1], c = 'r')
 	plt.xlabel('Time')
 	plt.ylabel('Number Infected')
-	plt.title('Number infected per time for Trajectory0 (1 min samples)')
+	plt.title('Number infected per time for herd 6 (10 min samples)')
 	plt.plot( matrix[0], matrix[1], '-g' )
 	plt.show()
 	
@@ -118,7 +118,7 @@ def kde(data):
 	sns.kdeplot(data, shade=True)
 	plt.axvline(np.mean(data), color='r', linestyle='dashed', linewidth=2)
 	plt.ylabel('Normalized probability')
-	plt.xlabel('Difference in COM')
+	plt.xlabel('Time to 90% of flock infected (100 runs)')
 	#plt.title('100 samples of Trajectory0 (1 min samples')
 	plt.show()
 
