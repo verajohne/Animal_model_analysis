@@ -2,7 +2,6 @@ from __future__ import division
 import numpy as np
 import random
 
-
 import frnnr
 import infection
 
@@ -54,7 +53,6 @@ class Field(object):
 		for an infection to be possible
 		'''
 		self.infection_radius = np.sqrt(infection.p*(infection.d**2)/0.001)
-		#self.infection_radius = 15
 	
 	def get_infection_dic(self):
 		nr_of_herds = len(self.flocks)

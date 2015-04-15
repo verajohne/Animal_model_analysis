@@ -8,6 +8,7 @@ import random
 import dataprocessor as dp
 import infection
 import field
+import frnnr
 
 '''
 Metrics for KS tests to evaluate models
@@ -77,6 +78,27 @@ def diff_com(trajectory):
 		diff_com.append(distance)
 	
 	return diff_com
+	
+def diff_com_vectors(trajectory):
+	six_loggers = random.sample(range(100), 6)
+	diff_com = []
+	for ts in range(trajectory.shape[1]):
+	#for ts in range(10):
+		com6 = np.zeros(2)
+		for log in six_loggers:
+			com6 += np.array([trajectory[0,ts,log], trajectory[1,ts,log]])
+		com6 = com6/float(6)
+		xs = np.mean(trajectory[0, ts])
+		ys = np.mean(trajectory[1, ts])
+		comF = np.array([xs,ys])
+		dv = np.subtract(comF,com6)
+		distance = np.linalg.norm(comF-com6)
+		if distance < 500:
+			diff_com.append(dv)
+		else: 
+			print 1
+	
+	return diff_com
 		
 def convexhull(trajectory):
 	'''
@@ -109,12 +131,26 @@ def infection_analysis(trajectory_list, p,d, runs):
 		result.append(time)
 	return np.array(result)
 
+def metric_analysis(trajectory, N):
+	neighbors = []
+
+	for ts in range(trajectory.shape[1]):
+		print ts
+		matrix = dp.returnTimeMap(ts, trajectory)
+		points = dp.getListPoints(matrix[0], matrix[1])
+		f = frnnr.frnnr(N, points)
+		for i in range(100):
+			p = np.array([matrix[0][i],matrix[1][i]])
+			distances = f.get_distances(p)
+			neighbors.append(len(distances))
+	return np.array(neighbors)
+
 def leave_one_out_analysis(list_of_herd_trajectories, p,d):
 	herds = len(list_of_herd_trajectories)
 	for i in range(herds):
 		list = herds[:i] + herds[i+1 :]
 		result = infection_analysis(list, p,d,100)
-		fn = 'LO_herd' + str(i+1) + '.mat'
+		fn = 'leave_out/LO_herd' + str(i+1) + '.mat'
 		matrix_file = sio.savemat(fn, mdict={'stats': result}, format = '5' )
 
 		

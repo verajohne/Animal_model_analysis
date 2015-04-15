@@ -4,15 +4,16 @@ from scipy.spatial import ConvexHull
 import random
 
 '''
-Standard matrix format is [space_dimensions,time_steps, nodes]
+Standard trajectory format is [space_dimensions,time_steps, nodes]
 Mostly a set of helper functions used in scripts and other modules
+matrix implies 2D in this file. For example a position matrix for a time instance.
 '''
 
-def slice_time(matrix, t0, t1):
+def slice_time(trajectory, t0, t1):
 	'''
 	return subset of time interval: [t0,t1]
 	'''
-	return matrix[0:2, t0:t1, 0:100]
+	return trajectory[0:2, t0:t1, 0:100]
 
 def merge_matrixes(list_of_trajectories):
 	'''
@@ -94,21 +95,21 @@ def randomlist(r, sample_size):
 	'''
 	return random.sample(range(r), sample_size)
 		
-def getTimeSeriesForNode(i, matrix):
+def getTimeSeriesForNode(i, trajectory):
 	'''
 	returns trajectory for a particular node over time
 	'''
-	matrix = np.transpose(matrix)
-	return np.transpose(matrix[i])
+	matrix = np.transpose(trajectory)
+	return np.transpose(trajectory[i])
 
-def getSubset(indexes, matrix):
+def getSubset(indexes, trajectory):
 	'''
 	returns matrix for a subset of the nodes in matrix
 	as specified in indexes
 	'''
-	subset = getTimeSeriesForNode(indexes[0], matrix)
+	subset = getTimeSeriesForNode(indexes[0], trajectory)
 	for i in range(1,len(indexes)):
-		temp = getTimeSeriesForNode(indexes[i], matrix)
+		temp = getTimeSeriesForNode(indexes[i], trajectory)
 		subset = np.dstack((subset, temp))
 	return subset
 
@@ -148,23 +149,30 @@ def rotate_about_point(vector, rotation_vector, angle):
 	return v
 
 def com(matrix):
-	#2D time instance matrix
+	'''
+	2D time instance matrix
+	com = centre of mass
+	'''
 	return np.array([np.mean(matrix[0]), np.mean(matrix[1])])
 
-def get_com(matrix):
+def get_com(trajectory):
 	'''
 	returns a list of com
 	'''
 	com = []
-	for ts in range(matrix.shape[1]):
-		xs = np.mean(matrix[0, ts])
-		ys = np.mean(matrix[1, ts])
+	for ts in range(trajectory.shape[1]):
+		xs = np.mean(trajectory[0, ts])
+		ys = np.mean(trajectory[1, ts])
 		comts = np.array([xs,ys])
 		com.append(comts)	
 	return np.array(com)
 
-def get_delta_com(matrix):
-	com = get_com(matrix)
+def get_delta_com(trajectory):
+	'''
+	returns a list of transition vectors between the center of mass
+	at each time step
+	'''
+	com = get_com(trajectory)
 	dcom = []
 	for i in range(len(com) - 1):
 		dc = np.subtract(com[i+1], com[i])
@@ -230,6 +238,19 @@ def position_matrix_around_new_center(matrix, center):
 
 def angle_to_unit_vector(angle):
 	return np.array([np.cos(angle), np.sin(angle)])
+
+def get_list_of_rates(dic):
+	'''
+	given dictionary of infection rates
+	return lists of matrixes of infection for stats plotting
+	'''
+	result = []
+	for i in range(1,len(dic)+1):
+		y = np.array(dic[i])
+		x = np.arange(y.size)
+		xy = np.array([x,y])
+		result.append(xy)
+	return result
 	
 		
 

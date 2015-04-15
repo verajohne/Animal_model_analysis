@@ -5,6 +5,7 @@ import seaborn as sns
 from scipy.stats import norm  
 import scipy.io
 import dataset_time as dst
+import scipy.stats
 
 '''
 For plotting of data
@@ -79,12 +80,19 @@ def plot_cdfs(sets):
 	#plt.setp(labels, rotation=45)
 	plt.show()
 
-def plot(matrix):
+def plot(matrixes):
 	#plt.scatter(matrix[0],matrix[1], c = 'r')
 	plt.xlabel('Time')
 	plt.ylabel('Number Infected')
-	plt.title('Number infected per time for herd 6 (10 min samples)')
-	plt.plot( matrix[0], matrix[1], '-g' )
+	#plt.title('Number infected per time for herd 6 (10 min samples)')
+	#c= ['-r','-b', '-g']
+	c= ['-r','-b', '-g', '-y', '-k', '-m', '-c', '#fe677f', '#FF00FF','#9900CC', '#663333', '#00FFCC','#FF9900', '#FFCC33']
+	for matrix,col in zip(matrixes,c):
+		plt.plot( matrix[0], matrix[1], col )
+	#plt.text(14000,20, 'Dataset 3', verticalalignment='bottom', horizontalalignment='right', color='red', fontsize=10)
+	#plt.text(14000, 10, 'Model 3',verticalalignment='bottom', horizontalalignment='right', color='blue', fontsize=10)
+	plt.xlimit(0,13000)
+	plt.ylimit(0,100)
 	plt.show()
 	
 def set_graph():
@@ -97,6 +105,33 @@ def trim_data(data, lower, upper):
 	new_data = [i for i in data if i >= lwr and i <= upr]
 	return np.array(new_data)
 	
+def distribution_fit(array):
+	#distributions = ['gamma', 'beta', 'norm', 'weibull_min', 'wald', 'powerlaw','invgauss']
+	distributions = ['weibull_min', 'beta', 'invgauss']
+	h = plt.hist(array, bins=range(48), color='w')
+	x = scipy.arange(array.size)
+	for d in distributions:
+		distribution = getattr(scipy.stats, d)
+		param = distribution.fit(array)
+		pdf_fitted = distribution.pdf(x, *param[:-2], loc=param[-2], scale=param[-1]) * array.size
+		plt.plot(pdf_fitted, label=d)
+	plt.legend(loc='upper right')
+	plt.xlim(0,20)
+	plt.ylim(0,400000)
+	plt.xlabel('Step size')
+	plt.ylabel('Number of occurrences')
+	plt.show()
+	
+def heat_map(x,y):
+	'''
+	x,y numpy array
+	'''
+	x = x.ravel()
+	y = y.ravel()
+	plt.hexbin(XX,YY,gridsize = 1000,cmap=plt.cm.jet, bins=None)
+	cb = plt.colorbar()
+	plt.show()
+	
 def histogram(x, bins = 10, rp = False, weights = True, normed = False):
 	set_graph()
 	if rp == True:
@@ -108,9 +143,9 @@ def histogram(x, bins = 10, rp = False, weights = True, normed = False):
 	else:
 		plt.hist(x, bins = bins, normed = normed)
 	plt.ylabel('Normalized probability')
-	plt.xlabel('Difference in convex hull area')
-	plt.xlim(0,3500000)
-	plt.ylim(0,0.35)
+	plt.xlabel('Step Size')
+	plt.xlim(0,100)
+	#plt.ylim(0,0.35)
 	plt.axvline(np.mean(x), color='r', linestyle='dashed', linewidth=2)
 	plt.show()
 
@@ -118,7 +153,8 @@ def kde(data):
 	sns.kdeplot(data, shade=True)
 	plt.axvline(np.mean(data), color='r', linestyle='dashed', linewidth=2)
 	plt.ylabel('Normalized probability')
-	plt.xlabel('Time to 90% of flock infected (100 runs)')
+	plt.xlabel('Step size Dataset 3')
+	plt.xlim(0,10.5)
 	#plt.title('100 samples of Trajectory0 (1 min samples')
 	plt.show()
 

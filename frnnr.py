@@ -1,7 +1,7 @@
 import numpy as np
 
 '''
-Fixes-Radius Near Neighbour Reporting using bucket like algorithm
+Fixed-Radius Near Neighbour Reporting using bucket like algorithm
 Given a cartesian space of points, 'p', report neighbors
 within a given radius 'r' of this node.
 
