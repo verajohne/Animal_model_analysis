@@ -1,5 +1,5 @@
 # sheep_model_analysis
-sheep_model_analysis aims to model epidemiology in herds of sheep. Based on real data from GPS loggers in herds of sheep, the goal is to create a realistic model of epidemiology in herds of sheep. We want to discover how accurate of a model, or more precisely what kind of model, is necessary to realistically model epidemiology in a herd or multiple herds in a field.
+sheep_model_analysis aims to model epidemiology of infectious disease in flocks of sheep using real data from GPS loggers in flocks of sheep.
 
 ##Dependencies:
 ###Python:
@@ -11,4 +11,3 @@ sheep_model_analysis aims to model epidemiology in herds of sheep. Based on real
 
 ##IPython Notebook example
 
-I will soon put up an iPython tutorial/example if you want to play around.
