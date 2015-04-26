@@ -26,26 +26,6 @@ def merge_matrixes(list_of_trajectories):
 		result = np.dstack((result, list_of_trajectories[i]))
 	return result
 
-def random_walk(steps):
-	temp = np.array([1000.0,1000.5])
-	result = [temp]
-	i = 0
-	for step in range(steps -1):
-		#if step % 120 == 0:
-		#	i = i + np.pi/2
-		#	i = i % (3*np.pi/2)
-		#direction = np.random.uniform(0+i,np.pi/2 +i)
-		'''
-		direction = np.random.uniform(0,2*np.pi)
-		dx = np.cos(direction)
-		dy = np.sin(direction)
-		d = np.array([dx,dy])
-		temp = np.add(temp, d)
-		result.append(temp)
-		'''
-		result.append(temp)
-	return result	
-
 def random_array_list(listlength): #???
 	result = []
 	step_size = 0.5
@@ -72,21 +52,7 @@ def returnTimeMap(ts, trajectory):
 	'''
 	returns 2D matrix image of points at particular timestep
 	'''
-	#return trajectory.swapaxes(0,1)[ts]
 	return np.array([trajectory[0][ts], trajectory[1][ts]])
-	
-def importData():
-	'''
-	helper function for quick import of matlab matrices during testing
-	'''
-	trajectory_mat = scipy.io.loadmat('../matrixes/trajectory.mat')
-	trajectory = trajectory_mat['trajectory']
-	return trajectory
-	
-def importMatrix(path, id):
-	trajectory_mat = scipy.io.loadmat(path)
-	trajectory = trajectory_mat[id]
-	return trajectory
 	
 def randomlist(r, sample_size):
 	'''
@@ -178,35 +144,6 @@ def get_delta_com(trajectory):
 		dc = np.subtract(com[i+1], com[i])
 		dcom.append(dc)
 	return dcom
-
-def polygon_area(vertices):
-	'''
-	shoelace algorithm
-	'''
-	n = len(vertices)
-	area = 0.0
-	for i in range(n):
-		j = (i + 1) % n
-		area += vertices[i][0] * vertices[j][1]
-		area -= vertices[j][0] * vertices[i][1]
-	area = abs(area) / 2.0
-	return area
-
-def ch_area(matrix):
-	'''
-	given matrix, returns list of convex hull areas per time
-	'''
-	ch_area = []
-	for ts in range(matrix.shape[1]):
-		points = getListPoints(matrix[0][ts], matrix[1][ts])
-		hull = ConvexHull(points)
-		vertex_indexes = hull.vertices
-		p = []
-		for i in vertex_indexes:
-			p.append(points[i])
-		area = polygon_area(p)
-		ch_area.append(area)
-	return ch_area
 	
 def vector_to_angle(vector):
 	'''returns positive angles '''

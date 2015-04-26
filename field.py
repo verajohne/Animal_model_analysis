@@ -5,7 +5,7 @@ import random
 import frnnr
 import infection
 
-#### CONSTANTS
+
 HERD_SIZE = 100
 
 
@@ -15,7 +15,6 @@ def update_dic(dictionary, nr_of_herds, infection_map):
 	Dictionary maps herd id to number of infected per time update_dic is called.
 	Each herd_id, i, maps to a list of number of infected per time step.
 	'''
-	
 	for i in range(nr_of_herds):
 		index0 = i*100
 		imap = infection_map[index0:index0 + HERD_SIZE]
@@ -33,8 +32,7 @@ class Field(object):
 	def __init__(self, flocks, infection):
 		'''
 		flocks are the standard trajectory format
-		Assumes flocks are of equal size
-		flocks is a list of trajectories
+		flocks is a list of trajectory matrices
 		'''
 		self.flocks = flocks
 		
@@ -55,6 +53,9 @@ class Field(object):
 		self.infection_radius = np.sqrt(infection.p*(infection.d**2)/0.001)
 	
 	def get_infection_dic(self):
+		'''
+		produces empty infection dic
+		'''
 		nr_of_herds = len(self.flocks)
 		dictionary = {}
 		for i in range(1, nr_of_herds + 1):
@@ -69,7 +70,8 @@ class Field(object):
 	
 	def run(self, dic = False):
 		'''
-		returns
+		run infection simulation in field of sheep
+		returns:
 		1. dictionary of a mapping of herd to list of #infected/time (dic=True)
 		2. time till 90% of total field infected
 		returns -1 if 90% of flock failed to be infected.
@@ -86,24 +88,18 @@ class Field(object):
 			dictionary = self.get_infection_dic()
 		
 		for ts in range(self.time_samples):
-			
 			infection_map = self.infect(ts, infection_map)
-			
 			if dic == True:
 				dictionary = update_dic(dictionary, len(self.flocks), infection_map)
 			
 			number_infected = np.bincount(infection_map)[1]
 			percentage_infected = number_infected /float( len(self.flocks)*HERD_SIZE )
-			if percentage_infected >= 0.90 and t90 == False:
+			
+			if percentage_infected >= 0.60 and t90 == False:
 				time_to90 = ts
 				t90 = True
 
 		if dic == True:
-			for key in dictionary.keys():
-				file = 'stats_herd' + str(key) + '.mat'
-				data = np.array([dictionary[key]])
-				#matrix_file = scipy.io.savemat(filename, mdict={'stats': data}, format = '5' )
-		
 			return (time_to90, dictionary)
 		else:
 			return time_to90
@@ -132,7 +128,7 @@ class Field(object):
 			p = np.array([self.points[0][ts][i], self.points[1][ts][i]])
 			infected_points.append(p)
 		'''
-		Get points within INFECTION RADIUS through fixed neighbour reporting
+		Get points within the infectious radius through fixed neighbour reporting
 		Only check node compared to infected nodes
 		'''
 		f = frnnr.frnnr(self.infection_radius, infected_points)

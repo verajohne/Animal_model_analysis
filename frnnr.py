@@ -10,7 +10,6 @@ contained in the bucket.
 '''
 
 class frnnr(object):
-	
 	def __init__(self,r, p):
 		self.radius = r
 		self.points = p
@@ -45,10 +44,6 @@ class frnnr(object):
 	def return_nodes_inrange_to_check(self, point):
 		'''
 		returns points in bucket and all neighboring buckets
-		 __  __	 __	
-		|__||__||__| 
-		|__||__||__|
-		|__||__||__|
 		'''
 		nodes = []
 		bucket = self.getBucket(point)
@@ -62,9 +57,7 @@ class frnnr(object):
 		return nodes
 			
 	def get_distances(self, point):
-	
 		nodes = self.return_nodes_inrange_to_check(point)
-		
 		distance = []
 		for node in nodes:
 			dist = np.linalg.norm(point - node)
