@@ -11,13 +11,10 @@ import field
 import frnnr
 
 '''
-Metrics for KS tests to evaluate models
-
-1. Mean distance to nearest neighbor per time
-2. com100-com6 per time
-3. convehhull per time
-4. time to 90% infection
+This module includes functions to aid
+parameter tests for hypotheses 1 and 2
 '''
+
 def polygon_area(vertices):
 	'''
 	shoelace algorithm
@@ -43,12 +40,11 @@ def getListPoints(x,y):
 
 def avg_knn(trajectory, K):
 	'''
-	return list of avg distance to Kth neighbor
+	return list of distances to kth nearest neighbor for each point
+	at each time step
 	'''
-	mean_distances_to_KNN = []
-	samples = trajectory.shape[2]
+	distances_to_KNN = np.empty(0)
 	for ts in range(trajectory.shape[1]):
-	#for ts in range(10):
 		xs = trajectory[0, ts]
 		ys = trajectory[1, ts]
 		points = np.array(getListPoints(xs,ys))
@@ -57,16 +53,17 @@ def avg_knn(trajectory, K):
 		distances = nbrs.kneighbors(points)[0]
 		distances = distances.swapaxes(0,1)
 		distances_to_kth = distances[K]
-		mean_d = sum(distances_to_kth)/float(samples)
-		mean_distances_to_KNN.append(mean_d)
-	
-	return mean_distances_to_KNN
+		distances_to_KNN = np.concatenate((distances_to_KNN, distances_to_kth))h
+	return distances_to_KNN
 
 def diff_com(trajectory):
+	'''
+	return difference in com between 6 random nodes
+	and the com of the trajectory at each time step
+	'''
 	six_loggers = random.sample(range(100), 6)
-	diff_com = []
+	diff_com = np.empty(0)
 	for ts in range(trajectory.shape[1]):
-	#for ts in range(10):
 		com6 = np.zeros(2)
 		for log in six_loggers:
 			com6 += np.array([trajectory[0,ts,log], trajectory[1,ts,log]])
@@ -75,11 +72,16 @@ def diff_com(trajectory):
 		ys = np.mean(trajectory[1, ts])
 		comF = np.array([xs,ys])
 		distance = np.linalg.norm(comF-com6)
-		diff_com.append(distance)
+		diff_com = np.append(diff_com, distance)
 	
 	return diff_com
 	
 def diff_com_vectors(trajectory):
+	'''
+	return list of vectors
+	vectors is the vector between com of trajectory
+	and com of 6 random sheep at each time step
+	'''
 	six_loggers = random.sample(range(100), 6)
 	diff_com = []
 	for ts in range(trajectory.shape[1]):
@@ -92,22 +94,17 @@ def diff_com_vectors(trajectory):
 		ys = np.mean(trajectory[1, ts])
 		comF = np.array([xs,ys])
 		dv = np.subtract(comF,com6)
-		distance = np.linalg.norm(comF-com6)
-		if distance < 500:
-			diff_com.append(dv)
-		else: 
-			print 1
-	
+		diff_com.append(dv)
+		
 	return diff_com
 		
 def convexhull(trajectory):
 	'''
 	convex hull at each timestep
 	'''
-	ch = []
+	ch = np.empty(0)
 	
 	for ts in range(trajectory.shape[1]):
-	#for ts in range(10):
 		xs = trajectory[0,ts]
 		ys = trajectory[1,ts]
 		pointsF = zip(xs,ys)
@@ -117,25 +114,13 @@ def convexhull(trajectory):
 		for i in vertex_indexes:
 			p.append(pointsF[i])
 		areaF = polygon_area(p)
-		ch.append(areaF)
+		ch = np.append(ch, areaF)
 	
 	return ch
 
-def infection_analysis(trajectory_list, p,d, runs):
-	result = []
-	i = infection.Infection(p, d)
-	f = field.Field(trajectory_list, i)
-	for i in range(runs):
-		print i
-		time = f.run()
-		result.append(time)
-	return np.array(result)
-
-def metric_analysis(trajectory, N):
+def number_of_neighbords_within_radius(trajectory, N):
 	neighbors = []
-
 	for ts in range(trajectory.shape[1]):
-		print ts
 		matrix = dp.returnTimeMap(ts, trajectory)
 		points = dp.getListPoints(matrix[0], matrix[1])
 		f = frnnr.frnnr(N, points)
@@ -144,8 +129,32 @@ def metric_analysis(trajectory, N):
 			distances = f.get_distances(p)
 			neighbors.append(len(distances))
 	return np.array(neighbors)
+			
+def distance_travelled(trajectory):
+	'''
+	distance travelled by a flock
+	'''
+	t = trajectory.shape[1] - 1
+	matrix_0 = dp.returnTimeMap(0,trajectory)
+	matrix_t = dp.returnTimeMap(t,trajectory)
+	com0 = dp.com(matrix_0)
+	comt = dp.com(matrix_t)
+	return np.linalg.norm(com0- comt)
+
+def infection_analysis(trajectory_list, p,d, runs):
+	result = []
+	i = infection.Infection(p, d)
+	f = field.Field(trajectory_list, i)
+	for i in range(runs):
+		time = f.run()
+		result.append(time)
+	return np.array(result)
 
 def leave_one_out_analysis(list_of_herd_trajectories, p,d):
+	'''
+	difference in spread of infection, varying which of
+	the 14 flocks are present in field.
+	'''
 	herds = len(list_of_herd_trajectories)
 	for i in range(herds):
 		list = herds[:i] + herds[i+1 :]
@@ -153,10 +162,7 @@ def leave_one_out_analysis(list_of_herd_trajectories, p,d):
 		fn = 'leave_out/LO_herd' + str(i+1) + '.mat'
 		matrix_file = sio.savemat(fn, mdict={'stats': result}, format = '5' )
 
-		
-		
-		
-		
+	
 		
 		
 		
