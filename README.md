@@ -1,6 +1,3 @@
-# sheep_model_analysis
-sheep_model_analysis aims to model epidemiology of infectious disease in flocks of sheep using real data from GPS loggers in flocks of sheep.
-
 ##Dependencies:
 ###Python:
 - [matplotlib](http://matplotlib.org/ "matplotlib")
